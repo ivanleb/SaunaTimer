@@ -44,6 +44,11 @@ android {
             signingConfig = signingConfigs.findByName("release")
         }
     }
+    // F-Droid: don't embed the Google-encrypted dependency report in the APK.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
