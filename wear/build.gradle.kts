@@ -17,7 +17,7 @@ android {
 
     defaultConfig {
         // Must match the phone app: the Data Layer only connects apps with the same id and signature.
-        applicationId = "com.saunapulse.app"
+        applicationId = "com.saunapulse.wear"
         minSdk = 30
         targetSdk = 35
         versionCode = 100001

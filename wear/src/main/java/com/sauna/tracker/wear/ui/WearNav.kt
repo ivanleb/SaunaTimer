@@ -20,6 +20,12 @@ import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
 import com.sauna.tracker.wear.LiveSession
 import com.sauna.tracker.wear.R
 import com.sauna.tracker.wear.SessionService
+import com.sauna.tracker.wear.WatchSync
+import com.sauna.tracker.wear.appScope
+import com.sauna.tracker.shared.sync.BluetoothLink
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 @Composable
 fun WearNav(ambient: Boolean, ambientTick: Int) {
@@ -35,6 +41,32 @@ fun WearNav(ambient: Boolean, ambientTick: Int) {
         addAll(heartRatePermissions)
         add(Manifest.permission.ACTIVITY_RECOGNITION)
         if (Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
+        BluetoothLink.PERMISSION?.let(::add) // to send rounds to the phone
+    }
+
+    fun sendToPhone() {
+        Toast.makeText(context, R.string.syncing, Toast.LENGTH_SHORT).show()
+        appScope.launch {
+            val outcome = WatchSync.syncNow(context)
+            val message = when (outcome.status) {
+                WatchSync.Status.OK -> context.getString(R.string.sync_ok_fmt, outcome.sent)
+                WatchSync.Status.NO_PERMISSION -> context.getString(R.string.sync_no_permission)
+                WatchSync.Status.BLUETOOTH_OFF -> context.getString(R.string.sync_bt_off)
+                WatchSync.Status.NO_PHONE -> context.getString(R.string.sync_no_phone)
+                WatchSync.Status.UNREACHABLE -> context.getString(R.string.sync_unreachable)
+            }
+            withContext(Dispatchers.Main) { Toast.makeText(context, message, Toast.LENGTH_LONG).show() }
+        }
+    }
+
+    val bluetoothLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { sendToPhone() }
+
+    fun requestSend() {
+        val permission = BluetoothLink.PERMISSION
+        if (permission != null && !BluetoothLink.hasPermission(context)) bluetoothLauncher.launch(permission)
+        else sendToPhone()
     }
 
     fun startRound() {
@@ -84,6 +116,7 @@ fun WearNav(ambient: Boolean, ambientTick: Int) {
                     onOpenRound = { nav.navigate(Routes.SESSION) },
                     onRecent = { nav.navigate(Routes.RECENT) },
                     onSettings = { nav.navigate(Routes.SETTINGS) },
+                    onSend = ::requestSend,
                 )
             }
             composable(Routes.SESSION) {

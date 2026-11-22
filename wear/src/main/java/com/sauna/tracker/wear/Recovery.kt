@@ -1,10 +1,10 @@
 package com.sauna.tracker.wear
 
+import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.health.services.client.HealthServices
 import androidx.health.services.client.data.ExerciseTrackedStatus
-import com.sauna.tracker.shared.SyncHub
 import com.sauna.tracker.shared.db.SaunaDb
 import com.sauna.tracker.shared.db.finish
 import kotlinx.coroutines.guava.await
@@ -30,10 +30,11 @@ object Recovery {
             Log.i(TAG, "Recovering interrupted round ${it.id}")
             dao.finish(it.id, durationMs = null, interrupted = true)
         }
-        SyncHub.get(ctx).sendAllUnsynced()
+        WatchSync.request(ctx)
     }
 
     /** Health Services keeps an exercise running after our process dies; stop it to save battery. */
+    @SuppressLint("RestrictedApi", "WrongConstant") // the public status constants live on a restricted companion
     private suspend fun endLeftoverExercise(ctx: Context) {
         try {
             val client = HealthServices.getClient(ctx).exerciseClient

@@ -27,7 +27,7 @@ import androidx.wear.ongoing.OngoingActivity
 import androidx.wear.ongoing.Status
 import com.sauna.tracker.shared.AlertPolicy
 import com.sauna.tracker.shared.HrSample
-import com.sauna.tracker.shared.SyncHub
+import com.sauna.tracker.shared.Repo
 import com.sauna.tracker.shared.db.SampleEntity
 import com.sauna.tracker.shared.db.SaunaDb
 import com.sauna.tracker.shared.db.SessionEntity
@@ -95,7 +95,7 @@ class SessionService : Service() {
 
         scope.launch {
             Recovery.run(this@SessionService) // close any older cut-off round first
-            val settings = SyncHub.get(this@SessionService).settingsStore.current()
+            val settings = Repo.get(this@SessionService).settingsStore.current()
             // Write the row right away: from now on the round survives a shutdown.
             dao.upsertSession(
                 SessionEntity(
@@ -203,7 +203,7 @@ class SessionService : Service() {
                 withContext(Dispatchers.IO) { dao.finish(id, elapsed, interrupted = false) }
                 LiveSession.update { LiveState(lastFinishedId = id) }
                 sessionId = null
-                appScope.launch { SyncHub.get(this@SessionService).sendSession(id) }
+                WatchSync.request(this@SessionService)
             }
             releaseAndStop()
         }
@@ -225,7 +225,7 @@ class SessionService : Service() {
             appScope.launch {
                 dao.appendProgress(id, elapsed, batch)
                 dao.finish(id, elapsed, interrupted = true)
-                SyncHub.get(applicationContext).sendSession(id)
+                WatchSync.request(applicationContext)
             }
             LiveSession.update { LiveState(lastFinishedId = id) }
             exerciseClient?.endExerciseAsync()

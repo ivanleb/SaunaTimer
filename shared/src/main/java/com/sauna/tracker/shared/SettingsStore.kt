@@ -37,18 +37,24 @@ class SettingsStore(context: Context) {
     suspend fun deletedIds(): List<String> =
         ds.data.first()[DELETED]?.split(',')?.filter { it.isNotBlank() } ?: emptyList()
 
-    /** Remembers a deletion; keeps only the most recent ones so the DataItem stays small. */
+    /** Remembers a deletion; keeps only the most recent ones so the sync message stays small. */
     suspend fun addDeleted(id: String): List<String> {
         val updated = (deletedIds() - id + id).takeLast(MAX_TOMBSTONES)
         ds.edit { it[DELETED] = updated.joinToString(",") }
         return updated
     }
 
+    /** Time of the last successful sync with the other device (0 = never). */
+    val lastSync: Flow<Long> = ds.data.map { it[LAST_SYNC] ?: 0L }
+
+    suspend fun setLastSync(time: Long) { ds.edit { it[LAST_SYNC] = time } }
+
     private companion object {
         val TIME = intPreferencesKey("timeLimitMin")
         val HR = intPreferencesKey("hrLimit")
         val UPDATED = longPreferencesKey("updatedAt")
         val DELETED = stringPreferencesKey("deletedIds")
+        val LAST_SYNC = longPreferencesKey("lastSync")
         const val MAX_TOMBSTONES = 500
     }
 }

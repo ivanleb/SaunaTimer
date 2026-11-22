@@ -6,6 +6,14 @@
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
 
+    <!-- Direct Bluetooth link to the watch (sync without Google services or internet). -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_ADMIN" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <!-- Lets the system wake the app when the chosen watch is nearby (Android 12+). -->
+    <uses-permission android:name="android.permission.REQUEST_OBSERVE_COMPANION_DEVICE_PRESENCE" />
+    <uses-feature android:name="android.software.companion_device_setup" android:required="false" />
+    <uses-feature android:name="android.hardware.bluetooth" android:required="false" />
 
     <application
         android:allowBackup="false"
@@ -26,18 +34,14 @@
             </intent-filter>
         </activity>
 
-        <!-- Receives rounds, settings and deletions directly from the nearby watch. -->
         <service
-            android:name=".PhoneListenerService"
-            android:exported="true">
+            android:name=".sync.WatchPresenceService"
+            android:enabled="@bool/companion_service_enabled"
+            android:exported="true"
+            tools:targetApi="31"
+            android:permission="android.permission.BIND_COMPANION_DEVICE_SERVICE">
             <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-                <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
-                <action android:name="com.google.android.gms.wearable.CHANNEL_EVENT" />
-                <data
-                    android:host="*"
-                    android:pathPrefix="/"
-                    android:scheme="wear" />
+                <action android:name="android.companion.CompanionDeviceService" />
             </intent-filter>
         </service>
 

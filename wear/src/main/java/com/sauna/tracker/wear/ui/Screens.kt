@@ -1,6 +1,5 @@
 package com.sauna.tracker.wear.ui
 
-import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.focusable
 import androidx.compose.foundation.layout.Arrangement
@@ -52,7 +51,7 @@ import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import com.sauna.tracker.shared.Settings
-import com.sauna.tracker.shared.SyncHub
+import com.sauna.tracker.shared.Repo
 import com.sauna.tracker.shared.db.SaunaDb
 import com.sauna.tracker.shared.db.toSample
 import com.sauna.tracker.shared.formatDuration
@@ -86,9 +85,10 @@ fun HomeScreen(
     onOpenRound: () -> Unit,
     onRecent: () -> Unit,
     onSettings: () -> Unit,
+    onSend: () -> Unit,
 ) {
     val ctx = LocalContext.current
-    val hub = remember { SyncHub.get(ctx) }
+    val hub = remember { Repo.get(ctx) }
     val settings by hub.settingsStore.settings.collectAsStateWithLifecycle(Settings())
     val unsent by remember { SaunaDb.get(ctx).sessions().observeUnsyncedCount() }.collectAsStateWithLifecycle(0)
     val listState = rememberScalingLazyListState()
@@ -141,11 +141,7 @@ fun HomeScreen(
             item {
                 Chip(
                     modifier = Modifier.fillMaxWidth(),
-                    onClick = {
-                        Toast.makeText(ctx, ctx.getString(R.string.sending_fmt, unsent), Toast.LENGTH_SHORT).show()
-                        appScope.launch { hub.sendAllUnsynced() }
-                    },
-                    enabled = unsent > 0,
+                    onClick = onSend,
                     label = { Text(stringResource(R.string.send_to_phone)) },
                     secondaryLabel = {
                         Text(if (unsent > 0) stringResource(R.string.unsent_fmt, unsent) else stringResource(R.string.all_sent))
@@ -289,7 +285,7 @@ fun SummaryScreen(id: String, onDone: () -> Unit) {
                     label = stringResource(R.string.delete),
                     confirmLabel = stringResource(R.string.tap_again),
                     onConfirm = {
-                        appScope.launch { SyncHub.get(ctx).deleteSession(id) }
+                        appScope.launch { Repo.get(ctx).deleteSession(id) }
                         onDone()
                     },
                 )
@@ -333,7 +329,7 @@ fun RecentScreen(onOpen: (String) -> Unit) {
 @Composable
 fun SettingsScreen(onEdit: (String) -> Unit) {
     val ctx = LocalContext.current
-    val settings by remember { SyncHub.get(ctx).settingsStore.settings }.collectAsStateWithLifecycle(Settings())
+    val settings by remember { Repo.get(ctx).settingsStore.settings }.collectAsStateWithLifecycle(Settings())
     val listState = rememberScalingLazyListState()
 
     Scaffold(
@@ -368,7 +364,7 @@ fun SettingsScreen(onEdit: (String) -> Unit) {
 @Composable
 fun EditLimitScreen(which: String) {
     val ctx = LocalContext.current
-    val hub = remember { SyncHub.get(ctx) }
+    val hub = remember { Repo.get(ctx) }
     val isTime = which == "time"
     val range = if (isTime) Settings.TIME_RANGE else Settings.HR_RANGE
     val settings by hub.settingsStore.settings.collectAsStateWithLifecycle<Settings?>(null)

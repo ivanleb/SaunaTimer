@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Сауна трекер</string>
+    <string name="app_name">Сауна Пульс</string>
     <string name="sessions">Заходы в сауну</string>
     <string name="no_sessions">Заходов пока нет. Запишите заход на часах, и он появится здесь автоматически.</string>
-    <string name="request_sync">Синхронизировать с часами</string>
-    <string name="sync_requested">Запрос на отправку новых заходов отправлен на часы</string>
-    <string name="no_watch">Часы не подключены</string>
     <string name="compare">Сравнение</string>
     <string name="compare_fmt">Сравнить (%d)</string>
     <string name="share_csv">Поделиться CSV</string>
@@ -32,4 +29,16 @@
     <string name="interrupted">Прервано (часы выключились)</string>
     <string name="summary_fmt">%1$s · макс %2$d · сред %3$d</string>
     <string name="x_axis">Минуты от начала</string>
+    <string name="watch_connection">Связь с часами</string>
+    <string name="last_sync_fmt">Последняя синхронизация: %s</string>
+    <string name="last_sync_never">Синхронизации с часами ещё не было</string>
+    <string name="bt_permission_needed">Разрешите «Устройства поблизости», чтобы телефон получал раунды с часов по Bluetooth.</string>
+    <string name="allow">Разрешить</string>
+    <string name="setup_hint">Выберите часы один раз, чтобы раунды приходили, даже когда приложение закрыто.</string>
+    <string name="auto_sync_setup">Выбрать часы</string>
+    <string name="auto_sync_on">Автосинхронизация включена: раунды приходят в фоне, когда часы рядом.</string>
+    <string name="change_watch">Выбрать другие часы</string>
+    <string name="auto_sync_old">Раунды приходят, пока приложение открыто. Фоновой синхронизации нужен Android 12 или новее.</string>
+    <string name="pairing_failed">Не удалось выбрать часы</string>
+    <string name="sync_hint">Часы отправляют каждый раунд после его окончания напрямую по Bluetooth. Интернет не используется. Чтобы синхронизировать сейчас, откройте «Сауна Пульс» на часах.</string>
 </resources>

@@ -1,31 +1,12 @@
 package com.sauna.tracker.wear
 
+import android.bluetooth.BluetoothDevice
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.google.android.gms.wearable.CapabilityInfo
-import com.google.android.gms.wearable.MessageEvent
-import com.google.android.gms.wearable.WearableListenerService
-import com.sauna.tracker.shared.SyncHub
+import android.os.Build
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-
-/**
- * Messages and reconnects from the phone. Everything arrives directly from the nearby phone;
- * nothing goes through the cloud (see SyncHub).
- */
-class WearListenerService : WearableListenerService() {
-    private val hub by lazy { SyncHub.get(this) }
-
-    override fun onMessageReceived(event: MessageEvent) {
-        runBlocking { hub.handleMessage(event, isPhone = false) }
-    }
-
-    /** The phone app became reachable (Bluetooth reconnected): send what is queued. */
-    override fun onCapabilityChanged(info: CapabilityInfo) {
-        if (info.nodes.any { it.isNearby }) runBlocking { hub.onConnected(isPhone = false) }
-    }
-}
 
 /** After the watch restarts (e.g. after shutting down from heat), recover and send the cut-off round. */
 class BootReceiver : BroadcastReceiver() {
@@ -34,6 +15,28 @@ class BootReceiver : BroadcastReceiver() {
         val pending = goAsync()
         appScope.launch {
             try { Recovery.run(context) } finally { pending.finish() }
+        }
+    }
+}
+
+/** The phone came back in Bluetooth range: send whatever is queued. */
+class BluetoothReceiver : BroadcastReceiver() {
+    override fun onReceive(context: Context, intent: Intent) {
+        if (intent.action != BluetoothDevice.ACTION_ACL_CONNECTED) return
+        val device = if (Build.VERSION.SDK_INT >= 33) {
+            intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE, BluetoothDevice::class.java)
+        } else {
+            @Suppress("DEPRECATION") intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE)
+        }
+        if (device == null || !WatchSync.isPhone(device)) return
+        val pending = goAsync()
+        appScope.launch {
+            try {
+                delay(3_000) // let the link settle
+                WatchSync.syncNow(context)
+            } finally {
+                pending.finish()
+            }
         }
     }
 }

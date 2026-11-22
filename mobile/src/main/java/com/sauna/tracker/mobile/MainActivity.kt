@@ -13,16 +13,8 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.lifecycle.lifecycleScope
-import com.google.android.gms.wearable.CapabilityInfo
-import com.google.android.gms.wearable.ChannelClient
-import com.google.android.gms.wearable.MessageEvent
-import com.google.android.gms.wearable.WearableListenerService
+import com.sauna.tracker.mobile.sync.PhoneSyncServer
 import com.sauna.tracker.mobile.ui.PhoneNav
-import com.sauna.tracker.shared.DataPaths
-import com.sauna.tracker.shared.SyncHub
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -40,26 +32,14 @@ class MainActivity : ComponentActivity() {
         }
     }
 
-    override fun onResume() {
-        super.onResume()
-        // Exchange settings/deletions and ask the watch for anything not yet received.
-        lifecycleScope.launch { SyncHub.get(this@MainActivity).requestSync() }
-    }
-}
-
-/** Receives rounds, settings and deletions directly from the nearby watch, even when the app is closed. */
-class PhoneListenerService : WearableListenerService() {
-    private val hub by lazy { SyncHub.get(this) }
-
-    override fun onChannelOpened(channel: ChannelClient.Channel) {
-        if (channel.path.startsWith(DataPaths.SESSION_PREFIX)) runBlocking { hub.receiveSession(channel) }
+    override fun onStart() {
+        super.onStart()
+        // While the app is open, accept the watch's sync connection.
+        PhoneSyncServer.acquire(this, "ui")
     }
 
-    override fun onMessageReceived(event: MessageEvent) {
-        runBlocking { hub.handleMessage(event, isPhone = true) }
-    }
-
-    override fun onCapabilityChanged(info: CapabilityInfo) {
-        if (info.nodes.any { it.isNearby }) runBlocking { hub.onConnected(isPhone = true) }
+    override fun onStop() {
+        PhoneSyncServer.release("ui")
+        super.onStop()
     }
 }

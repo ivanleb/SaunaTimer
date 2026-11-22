@@ -19,9 +19,7 @@ android {
 dependencies {
     api(libs.androidx.core.ktx)
     api(libs.coroutines.android)
-    api(libs.coroutines.play.services)
     api(libs.serialization.json)
-    api(libs.play.services.wearable)
     api(libs.room.runtime)
     api(libs.room.ktx)
     ksp(libs.room.compiler)

@@ -1,11 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sauna Tracker</string>
+    <string name="app_name">Sauna Pulse</string>
     <string name="sessions">Sauna rounds</string>
     <string name="no_sessions">No rounds yet. Record one on the watch and it will show up here automatically.</string>
-    <string name="request_sync">Sync with watch</string>
-    <string name="sync_requested">Asked the watch to send new rounds</string>
-    <string name="no_watch">Watch not connected</string>
     <string name="compare">Compare</string>
     <string name="compare_fmt">Compare (%d)</string>
     <string name="share_csv">Share CSV</string>
@@ -32,4 +29,16 @@
     <string name="interrupted">Interrupted (watch turned off)</string>
     <string name="summary_fmt">%1$s · max %2$d · avg %3$d</string>
     <string name="x_axis">Minutes from start</string>
+    <string name="watch_connection">Watch connection</string>
+    <string name="last_sync_fmt">Last sync: %s</string>
+    <string name="last_sync_never">No sync with the watch yet</string>
+    <string name="bt_permission_needed">Allow \"Nearby devices\" so the phone can receive rounds from the watch over Bluetooth.</string>
+    <string name="allow">Allow</string>
+    <string name="setup_hint">Choose your watch once, so rounds arrive even when this app is closed.</string>
+    <string name="auto_sync_setup">Choose watch</string>
+    <string name="auto_sync_on">Automatic sync is on: rounds arrive in the background whenever the watch is nearby.</string>
+    <string name="change_watch">Choose another watch</string>
+    <string name="auto_sync_old">Rounds arrive while this app is open. Background sync needs Android 12 or later.</string>
+    <string name="pairing_failed">Could not choose the watch</string>
+    <string name="sync_hint">The watch sends each round when it ends, directly over Bluetooth. Nothing goes through the internet. To sync right now, open Sauna Pulse on the watch.</string>
 </resources>

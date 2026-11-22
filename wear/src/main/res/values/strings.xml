@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Sauna Timer</string>
+    <string name="app_name">Sauna Pulse</string>
     <string name="start">Start</string>
     <string name="limits_fmt">%1$d min · %2$d bpm</string>
     <string name="session_running">Round in progress</string>
@@ -9,7 +9,6 @@
     <string name="send_to_phone">Send to phone</string>
     <string name="unsent_fmt">%d not sent</string>
     <string name="all_sent">All sent</string>
-    <string name="sending_fmt">Sending %d…</string>
     <string name="stop">Stop</string>
     <string name="tap_again">Tap again</string>
     <string name="time_limit">Time limit</string>
@@ -28,4 +27,10 @@
     <string name="notif_title">Sauna round</string>
     <string name="notif_channel">Active round</string>
     <string name="ambient_min_fmt">%d min</string>
+    <string name="syncing">Syncing with phone…</string>
+    <string name="sync_ok_fmt">Synced. Rounds sent: %d</string>
+    <string name="sync_no_permission">Allow \"Nearby devices\" to send rounds to the phone</string>
+    <string name="sync_bt_off">Bluetooth is off</string>
+    <string name="sync_no_phone">No paired phone found</string>
+    <string name="sync_unreachable">Phone not reachable. Open Sauna Pulse on the phone and try again.</string>
 </resources>

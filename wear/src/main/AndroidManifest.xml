@@ -6,7 +6,6 @@
     <uses-permission android:name="android.permission.INTERNET" tools:node="remove" />
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" tools:node="remove" />
 
-
     <uses-feature android:name="android.hardware.type.watch" />
 
     <!-- Heart rate: BODY_SENSORS up to Wear OS 5.1, READ_HEART_RATE on Wear OS 6 (API 36) and later. -->
@@ -19,6 +18,9 @@
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
+    <!-- Direct Bluetooth link to the paired phone (sync without Google services or internet). -->
+    <uses-permission android:name="android.permission.BLUETOOTH" android:maxSdkVersion="30" />
+    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
 
     <application
         android:name=".WearApp"
@@ -29,10 +31,6 @@
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@android:style/Theme.DeviceDefault">
-
-        <uses-library
-            android:name="com.google.android.wearable"
-            android:required="false" />
 
         <meta-data
             android:name="com.google.android.wearable.standalone"
@@ -54,24 +52,19 @@
             android:exported="false"
             android:foregroundServiceType="health" />
 
-        <service
-            android:name=".WearListenerService"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-                <action android:name="com.google.android.gms.wearable.CAPABILITY_CHANGED" />
-                <data
-                    android:host="*"
-                    android:pathPrefix="/"
-                    android:scheme="wear" />
-            </intent-filter>
-        </service>
-
         <receiver
             android:name=".BootReceiver"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <!-- The phone came back in range: send queued rounds. -->
+        <receiver
+            android:name=".BluetoothReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.bluetooth.device.action.ACL_CONNECTED" />
             </intent-filter>
         </receiver>
     </application>

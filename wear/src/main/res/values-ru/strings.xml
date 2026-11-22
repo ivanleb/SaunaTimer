@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Сауна таймер</string>
+    <string name="app_name">Сауна Пульс</string>
     <string name="start">Старт</string>
     <string name="limits_fmt">%1$d мин · %2$d уд/мин</string>
     <string name="session_running">Идёт заход</string>
@@ -9,7 +9,6 @@
     <string name="send_to_phone">Отправить на телефон</string>
     <string name="unsent_fmt">Не отправлено: %d</string>
     <string name="all_sent">Всё отправлено</string>
-    <string name="sending_fmt">Отправка: %d…</string>
     <string name="stop">Стоп</string>
     <string name="tap_again">Ещё раз</string>
     <string name="time_limit">Лимит времени</string>
@@ -28,4 +27,10 @@
     <string name="notif_title">Заход в сауну</string>
     <string name="notif_channel">Активный заход</string>
     <string name="ambient_min_fmt">%d мин</string>
+    <string name="syncing">Синхронизация с телефоном…</string>
+    <string name="sync_ok_fmt">Готово. Отправлено раундов: %d</string>
+    <string name="sync_no_permission">Разрешите «Устройства поблизости», чтобы отправлять раунды на телефон</string>
+    <string name="sync_bt_off">Bluetooth выключен</string>
+    <string name="sync_no_phone">Сопряжённый телефон не найден</string>
+    <string name="sync_unreachable">Телефон недоступен. Откройте «Сауна Пульс» на телефоне и повторите.</string>
 </resources>

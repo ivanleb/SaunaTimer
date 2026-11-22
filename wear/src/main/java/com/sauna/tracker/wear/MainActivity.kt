@@ -6,9 +6,7 @@ import androidx.activity.compose.setContent
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.wear.ambient.AmbientLifecycleObserver
-import com.sauna.tracker.shared.SyncHub
 import com.sauna.tracker.wear.ui.WearNav
-import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     private val isAmbient = mutableStateOf(false)
@@ -35,6 +33,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        appScope.launch { SyncHub.get(this@MainActivity).onConnected(isPhone = false) }
+        WatchSync.request(this)
     }
 }

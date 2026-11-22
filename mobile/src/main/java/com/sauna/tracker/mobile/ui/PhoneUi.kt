@@ -2,7 +2,15 @@
 
 package com.sauna.tracker.mobile.ui
 
-import android.widget.Toast
+import android.app.Activity
+import android.content.Context
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.IntentSenderRequest
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import com.sauna.tracker.mobile.sync.PhoneSyncServer
+import com.sauna.tracker.mobile.sync.WatchPairing
+import com.sauna.tracker.shared.sync.BluetoothLink
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -25,7 +33,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
@@ -70,7 +77,7 @@ import com.sauna.tracker.mobile.CsvShare
 import com.sauna.tracker.mobile.R
 import com.sauna.tracker.shared.Session
 import com.sauna.tracker.shared.Settings
-import com.sauna.tracker.shared.SyncHub
+import com.sauna.tracker.shared.Repo
 import com.sauna.tracker.shared.db.SaunaDb
 import com.sauna.tracker.shared.db.SessionEntity
 import com.sauna.tracker.shared.db.loadSession
@@ -123,7 +130,7 @@ fun PhoneNav() {
 private fun ListScreen(onOpen: (String) -> Unit, onCompare: (List<String>) -> Unit, onSettings: () -> Unit) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
-    val hub = remember { SyncHub.get(ctx) }
+    val hub = remember { Repo.get(ctx) }
     val dao = remember { SaunaDb.get(ctx).sessions() }
     val sessions by remember { dao.observeFinished() }.collectAsStateWithLifecycle(emptyList())
     var selected by rememberSaveable { mutableStateOf(listOf<String>()) }
@@ -136,12 +143,6 @@ private fun ListScreen(onOpen: (String) -> Unit, onCompare: (List<String>) -> Un
             TopAppBar(
                 title = { Text(stringResource(R.string.sessions)) },
                 actions = {
-                    IconButton(onClick = {
-                        scope.launch {
-                            val ok = hub.requestSync()
-                            Toast.makeText(ctx, if (ok) R.string.sync_requested else R.string.no_watch, Toast.LENGTH_SHORT).show()
-                        }
-                    }) { Icon(Icons.Filled.Refresh, stringResource(R.string.request_sync)) }
                     IconButton(
                         enabled = sessions.isNotEmpty(),
                         onClick = { scope.launch { CsvShare.share(ctx, sessions.mapNotNull { dao.loadSession(it.id) }) } },
@@ -168,11 +169,15 @@ private fun ListScreen(onOpen: (String) -> Unit, onCompare: (List<String>) -> Un
         },
     ) { padding ->
         if (sessions.isEmpty()) {
-            Box(Modifier.fillMaxSize().padding(padding).padding(32.dp), contentAlignment = Alignment.Center) {
-                Text(stringResource(R.string.no_sessions), textAlign = TextAlign.Center)
+            Column(Modifier.fillMaxSize().padding(padding)) {
+                SyncBanner(onSettings)
+                Box(Modifier.fillMaxSize().padding(32.dp), contentAlignment = Alignment.Center) {
+                    Text(stringResource(R.string.no_sessions), textAlign = TextAlign.Center)
+                }
             }
         } else {
             LazyColumn(contentPadding = padding) {
+                item { SyncBanner(onSettings) }
                 items(sessions, key = { it.id }) { s ->
                     val checked = s.id in selectedIds
                     SessionRow(
@@ -282,7 +287,7 @@ private fun DetailScreen(id: String, onBack: () -> Unit) {
             onDismiss = { confirmDelete = false },
             onConfirm = {
                 confirmDelete = false
-                scope.launch { SyncHub.get(ctx).deleteSession(id) }
+                scope.launch { Repo.get(ctx).deleteSession(id) }
                 onBack()
             },
         )
@@ -390,7 +395,7 @@ private fun CompareTable(sessions: List<Session>) {
 private fun SettingsScreen(onBack: () -> Unit) {
     val ctx = LocalContext.current
     val scope = rememberCoroutineScope()
-    val hub = remember { SyncHub.get(ctx) }
+    val hub = remember { Repo.get(ctx) }
     val settings by remember { hub.settingsStore.settings }.collectAsStateWithLifecycle(Settings())
 
     fun update(time: Int = settings.timeLimitMin, hr: Int = settings.hrLimit) {
@@ -422,6 +427,9 @@ private fun SettingsScreen(onBack: () -> Unit) {
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
+            Spacer(Modifier.height(24.dp))
+            HorizontalDivider()
+            WatchConnection()
         }
     }
 }
@@ -452,4 +460,115 @@ private fun LimitRow(label: String, value: Int, unit: String, range: IntRange, o
 @Composable
 private fun BackButton(onBack: () -> Unit) {
     IconButton(onClick = onBack) { Icon(Icons.AutoMirrored.Filled.ArrowBack, stringResource(R.string.back)) }
+}
+
+// ---------------------------------------------------------------- Watch connection
+
+/** Bluetooth permission and watch-pairing state, re-read whenever the screen resumes. */
+private data class SyncSetup(val hasPermission: Boolean, val paired: Boolean)
+
+private fun readSyncSetup(ctx: Context) =
+    SyncSetup(BluetoothLink.hasPermission(ctx), WatchPairing.associatedAddresses(ctx).isNotEmpty())
+
+@Composable
+private fun rememberSyncSetup(): Pair<SyncSetup, () -> Unit> {
+    val ctx = LocalContext.current
+    var setup by remember { mutableStateOf(readSyncSetup(ctx)) }
+    LifecycleResumeEffect(Unit) {
+        setup = readSyncSetup(ctx)
+        onPauseOrDispose {}
+    }
+    return setup to { setup = readSyncSetup(ctx) }
+}
+
+@Composable
+private fun rememberBluetoothPermissionRequest(onDone: () -> Unit): () -> Unit {
+    val ctx = LocalContext.current
+    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (granted) PhoneSyncServer.acquire(ctx, "ui")
+        onDone()
+    }
+    return { BluetoothLink.PERMISSION?.let(launcher::launch) }
+}
+
+/** Shown above the list until sync is fully set up. */
+@Composable
+private fun SyncBanner(onSettings: () -> Unit) {
+    val (setup, refresh) = rememberSyncSetup()
+    val requestPermission = rememberBluetoothPermissionRequest(refresh)
+    val (text, action, onClick) = when {
+        !setup.hasPermission -> Triple(R.string.bt_permission_needed, R.string.allow, requestPermission)
+        WatchPairing.supported && !setup.paired -> Triple(R.string.setup_hint, R.string.auto_sync_setup, onSettings)
+        else -> return
+    }
+    Card(Modifier.fillMaxWidth().padding(12.dp)) {
+        Column(Modifier.padding(16.dp)) {
+            Text(stringResource(text), style = MaterialTheme.typography.bodyMedium)
+            Spacer(Modifier.height(8.dp))
+            Button(onClick = onClick) { Text(stringResource(action)) }
+        }
+    }
+}
+
+@Composable
+private fun WatchConnection() {
+    val ctx = LocalContext.current
+    val (setup, refresh) = rememberSyncSetup()
+    val requestPermission = rememberBluetoothPermissionRequest(refresh)
+    val lastSync by remember { Repo.get(ctx).settingsStore.lastSync }.collectAsStateWithLifecycle(0L)
+    var error by remember { mutableStateOf<String?>(null) }
+
+    val picker = rememberLauncherForActivityResult(ActivityResultContracts.StartIntentSenderForResult()) { result ->
+        if (result.resultCode == Activity.RESULT_OK) WatchPairing.startObserving(ctx)
+        refresh()
+    }
+    fun pickWatch() {
+        error = null
+        WatchPairing.associate(
+            ctx,
+            onPicker = { picker.launch(IntentSenderRequest.Builder(it).build()) },
+            onFailure = { error = it?.toString() ?: ctx.getString(R.string.pairing_failed) },
+        )
+    }
+
+    Column(Modifier.padding(vertical = 16.dp)) {
+        Text(stringResource(R.string.watch_connection), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            if (lastSync > 0) stringResource(R.string.last_sync_fmt, formatDate(lastSync))
+            else stringResource(R.string.last_sync_never),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        Spacer(Modifier.height(12.dp))
+        when {
+            !setup.hasPermission -> {
+                Text(stringResource(R.string.bt_permission_needed), style = MaterialTheme.typography.bodyMedium)
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = requestPermission) { Text(stringResource(R.string.allow)) }
+            }
+            !WatchPairing.supported ->
+                Text(stringResource(R.string.auto_sync_old), style = MaterialTheme.typography.bodyMedium)
+            setup.paired -> {
+                Text(stringResource(R.string.auto_sync_on), style = MaterialTheme.typography.bodyMedium)
+                TextButton(onClick = { WatchPairing.forget(ctx); pickWatch() }) {
+                    Text(stringResource(R.string.change_watch))
+                }
+            }
+            else -> {
+                Text(stringResource(R.string.setup_hint), style = MaterialTheme.typography.bodyMedium)
+                Spacer(Modifier.height(8.dp))
+                Button(onClick = ::pickWatch) { Text(stringResource(R.string.auto_sync_setup)) }
+            }
+        }
+        error?.let {
+            Spacer(Modifier.height(8.dp))
+            Text(it, color = MaterialTheme.colorScheme.error, style = MaterialTheme.typography.bodySmall)
+        }
+        Spacer(Modifier.height(12.dp))
+        Text(
+            stringResource(R.string.sync_hint),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+        )
+    }
 }
