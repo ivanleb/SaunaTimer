@@ -1,6 +1,7 @@
 Categories:
   - Sports & Health
 License: GPL-3.0-only
+AuthorName: ivanleb
 SourceCode: https://github.com/ivanleb/SaunaTimer
 IssueTracker: https://github.com/ivanleb/SaunaTimer/issues
 Changelog: https://github.com/ivanleb/SaunaTimer/releases
@@ -13,7 +14,7 @@ Repo: https://github.com/ivanleb/SaunaTimer.git
 Builds:
   - versionName: 1.0.0
     versionCode: 1
-    commit: v1.0.0
+    commit: 96185e76f2e4ff088bd739a4809a1df3ef138e80
     subdir: mobile
     gradle:
       - yes
