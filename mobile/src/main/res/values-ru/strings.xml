@@ -41,4 +41,7 @@
     <string name="auto_sync_old">Раунды приходят, пока приложение открыто. Фоновой синхронизации нужен Android 12 или новее.</string>
     <string name="pairing_failed">Не удалось выбрать часы</string>
     <string name="sync_hint">Часы отправляют каждый раунд после его окончания напрямую по Bluetooth. Интернет не используется. Чтобы синхронизировать сейчас, откройте «Сауна Пульс» на часах.</string>
+    <string name="choose_watch_title">Выберите часы</string>
+    <string name="no_paired_devices">Нет сопряжённых устройств. Сначала сопрягите часы с телефоном (приложение Galaxy Wearable или настройки Bluetooth).</string>
+    <string name="looks_like_watch">Часы</string>
 </resources>

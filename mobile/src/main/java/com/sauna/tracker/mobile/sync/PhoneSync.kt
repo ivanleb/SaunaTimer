@@ -1,6 +1,7 @@
 package com.sauna.tracker.mobile.sync
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothClass
 import android.bluetooth.BluetoothServerSocket
 import android.bluetooth.BluetoothSocket
 import android.companion.AssociationInfo
@@ -139,12 +140,27 @@ object WatchPairing {
         }
     }
 
-    /** Shows the system picker; [onPicker] receives the intent to launch. */
-    fun associate(ctx: Context, onPicker: (IntentSender) -> Unit, onFailure: (CharSequence?) -> Unit) {
+    data class Paired(val name: String, val address: String, val isWatch: Boolean)
+
+    /** Devices already paired with this phone, watches first; readable names instead of a scan. */
+    @SuppressLint("MissingPermission")
+    fun pairedDevices(ctx: Context): List<Paired> {
+        if (!BluetoothLink.hasPermission(ctx)) return emptyList()
+        val bonded = BluetoothLink.adapter(ctx)?.bondedDevices.orEmpty()
+        return bonded.map {
+            val name = it.name ?: it.address
+            val watch = it.bluetoothClass?.majorDeviceClass == BluetoothClass.Device.Major.WEARABLE ||
+                name.contains("watch", ignoreCase = true)
+            Paired(name, it.address, watch)
+        }.sortedWith(compareByDescending<Paired> { it.isWatch }.thenBy { it.name.lowercase() })
+    }
+
+    /** Asks the system to confirm the chosen paired device; [onPicker] receives the dialog to launch. */
+    fun associate(ctx: Context, address: String, onPicker: (IntentSender) -> Unit, onFailure: (CharSequence?) -> Unit) {
         val cdm = cdm(ctx) ?: return onFailure(null)
         val request = AssociationRequest.Builder()
-            .addDeviceFilter(BluetoothDeviceFilter.Builder().build())
-            .setSingleDevice(false)
+            .addDeviceFilter(BluetoothDeviceFilter.Builder().setAddress(address).build())
+            .setSingleDevice(true)
             .build()
         val callback = object : CompanionDeviceManager.Callback() {
             @Deprecated("Replaced by onAssociationPending on Android 13")

@@ -41,4 +41,7 @@
     <string name="auto_sync_old">Rounds arrive while this app is open. Background sync needs Android 12 or later.</string>
     <string name="pairing_failed">Could not choose the watch</string>
     <string name="sync_hint">The watch sends each round when it ends, directly over Bluetooth. Nothing goes through the internet. To sync right now, open Sauna Pulse on the watch.</string>
+    <string name="choose_watch_title">Choose your watch</string>
+    <string name="no_paired_devices">No paired devices. Pair the watch with this phone first (Galaxy Wearable app or Bluetooth settings).</string>
+    <string name="looks_like_watch">Watch</string>
 </resources>

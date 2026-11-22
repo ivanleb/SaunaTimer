@@ -522,12 +522,45 @@ private fun WatchConnection() {
         if (result.resultCode == Activity.RESULT_OK) WatchPairing.startObserving(ctx)
         refresh()
     }
+    var choices by remember { mutableStateOf<List<WatchPairing.Paired>?>(null) }
     fun pickWatch() {
         error = null
+        choices = WatchPairing.pairedDevices(ctx)
+    }
+    fun choose(device: WatchPairing.Paired) {
+        choices = null
+        WatchPairing.forget(ctx) // replacing the previous choice, if any
         WatchPairing.associate(
             ctx,
+            device.address,
             onPicker = { picker.launch(IntentSenderRequest.Builder(it).build()) },
             onFailure = { error = it?.toString() ?: ctx.getString(R.string.pairing_failed) },
+        )
+    }
+
+    choices?.let { list ->
+        AlertDialog(
+            onDismissRequest = { choices = null },
+            title = { Text(stringResource(R.string.choose_watch_title)) },
+            text = {
+                if (list.isEmpty()) {
+                    Text(stringResource(R.string.no_paired_devices))
+                } else {
+                    Column(Modifier.verticalScroll(rememberScrollState())) {
+                        list.forEach { device ->
+                            ListItem(
+                                headlineContent = { Text(device.name) },
+                                supportingContent = if (device.isWatch) {
+                                    { Text(stringResource(R.string.looks_like_watch)) }
+                                } else null,
+                                modifier = Modifier.clickable { choose(device) },
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {},
+            dismissButton = { TextButton(onClick = { choices = null }) { Text(stringResource(R.string.cancel)) } },
         )
     }
 
@@ -550,7 +583,7 @@ private fun WatchConnection() {
                 Text(stringResource(R.string.auto_sync_old), style = MaterialTheme.typography.bodyMedium)
             setup.paired -> {
                 Text(stringResource(R.string.auto_sync_on), style = MaterialTheme.typography.bodyMedium)
-                TextButton(onClick = { WatchPairing.forget(ctx); pickWatch() }) {
+                TextButton(onClick = ::pickWatch) {
                     Text(stringResource(R.string.change_watch))
                 }
             }
