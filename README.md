@@ -2,7 +2,7 @@
 
 A sauna round timer and heart-rate recorder for Wear OS watches (developed on a Galaxy Watch4), with a phone companion app for history, comparison and CSV export.
 
-> **Status: work in progress.** The apps run and have been tested on a real Galaxy Watch4 and phone. Before the planned F-Droid release, the watch-to-phone sync is being moved from Google's Wearable Data Layer to direct Bluetooth, so the apps won't need Google Play Services.
+> **Status: work in progress, heading for F-Droid.** The apps run and have been tested on a real Galaxy Watch4 and an Android 14 phone. They have no Google Play Services dependency.
 
 ## Features
 - **Watch:** round timer, live BPM, a heart-rate graph, vibration alerts and an always-on (ambient) display during a round.
@@ -19,7 +19,12 @@ A sauna round timer and heart-rate recorder for Wear OS watches (developed on a 
 Your data stays on your watch and phone. It leaves them only when you share a CSV yourself.
 - The apps have **no internet permission**, no analytics, no ads and no accounts.
 - Android cloud backup and device-to-device transfer are disabled.
-- Watch and phone exchange data only directly with each other, when they are connected nearby.
+- Watch and phone exchange data only directly with each other, over an encrypted Bluetooth link between paired devices.
+
+## Sync
+- The watch sends each round to the phone when it ends. It also syncs when you open the watch app, after the watch restarts and when the phone comes back in range. Rounds the phone hasn't confirmed stay on the watch and go with the next sync.
+- Limits and deletions are synced both ways; the newest limit change wins.
+- On the phone, open **Settings → Watch connection → Choose watch** once. Android 12+ then wakes the app whenever the watch is nearby, so rounds arrive even when the app is closed. On older phones, rounds arrive while the app is open.
 
 ## Modules
 | Module | What |
@@ -49,7 +54,9 @@ Release builds read the signing key from `keystore.properties`; see `keystore.pr
    adb connect <ip>:<port>
    adb -s <ip>:<port> install -r wear-debug.apk
    ```
-4. Open the app and allow the heart-rate and notification permissions on first Start.
+4. Open the app and allow the heart-rate, notification and *Nearby devices* permissions on first Start.
+
+App ids: phone `com.saunapulse.app`, watch `com.saunapulse.wear`.
 
 ## CSV format
 One row per heart-rate reading:
