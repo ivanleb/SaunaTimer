@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notice_title">Перед началом</string>
+    <string name="notice_text">«Сауна Пульс» — не медицинское устройство. Часы могут измерять пульс неточно, особенно в жаре и на влажной коже.\n\nВибросигналы — только напоминания. Выходите из сауны, как только почувствуете недомогание, головокружение или перегрев, что бы ни показывало приложение.\n\nЕсли у вас проблемы с сердцем или давлением, спросите врача, безопасна ли для вас сауна.</string>
+    <string name="notice_ok">Понятно</string>
+    <string name="about">О приложении</string>
+    <string name="version_fmt">Версия %s</string>
+    <string name="privacy_title">Конфиденциальность</string>
+    <string name="privacy_text">Ваши данные остаются на часах и телефоне. У приложений нет доступа в интернет, нет аккаунтов, рекламы и аналитики. Часы и телефон связываются только напрямую по Bluetooth. Данные покидают устройства, только когда вы сами отправляете CSV.</string>
+    <string name="licence_text">Свободное ПО с открытым кодом, лицензия GNU GPL v3.</string>
+    <string name="source_code">Исходный код</string>
+    <string name="safety_title">Безопасность</string>
+</resources>

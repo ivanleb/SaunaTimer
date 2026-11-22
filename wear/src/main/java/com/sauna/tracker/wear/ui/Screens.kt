@@ -51,7 +51,9 @@ import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.compose.material.TimeText
 import com.sauna.tracker.shared.Settings
+import com.sauna.tracker.shared.Notice
 import com.sauna.tracker.shared.Repo
+import com.sauna.tracker.shared.R as SharedR
 import com.sauna.tracker.shared.db.SaunaDb
 import com.sauna.tracker.shared.db.toSample
 import com.sauna.tracker.shared.formatDuration
@@ -327,7 +329,7 @@ fun RecentScreen(onOpen: (String) -> Unit) {
 // ---------------------------------------------------------------- Settings
 
 @Composable
-fun SettingsScreen(onEdit: (String) -> Unit) {
+fun SettingsScreen(onEdit: (String) -> Unit, onAbout: () -> Unit) {
     val ctx = LocalContext.current
     val settings by remember { Repo.get(ctx).settingsStore.settings }.collectAsStateWithLifecycle(Settings())
     val listState = rememberScalingLazyListState()
@@ -353,6 +355,14 @@ fun SettingsScreen(onEdit: (String) -> Unit) {
                     onClick = { onEdit("hr") },
                     label = { Text(stringResource(R.string.hr_limit)) },
                     secondaryLabel = { Text("${settings.hrLimit} ${stringResource(R.string.unit_bpm)}") },
+                    colors = ChipDefaults.secondaryChipColors(),
+                )
+            }
+            item {
+                Chip(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onAbout,
+                    label = { Text(stringResource(SharedR.string.about)) },
                     colors = ChipDefaults.secondaryChipColors(),
                 )
             }
@@ -433,3 +443,57 @@ fun EditLimitScreen(which: String) {
 }
 
 private const val ROTARY_STEP_PX = 48f
+
+// ---------------------------------------------------------------- Notice and About
+
+/** Shown once before the first round: what the app can and cannot do for your safety. */
+@Composable
+fun NoticeScreen(onAccept: () -> Unit) {
+    val listState = rememberScalingLazyListState()
+    Scaffold(positionIndicator = { PositionIndicator(scalingLazyListState = listState) }) {
+        ScalingLazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+            item { ListHeader { Text(stringResource(SharedR.string.notice_title)) } }
+            item { Paragraph(stringResource(SharedR.string.notice_text)) }
+            item {
+                Chip(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = onAccept,
+                    label = { Text(stringResource(SharedR.string.notice_ok), fontWeight = FontWeight.Bold) },
+                    colors = ChipDefaults.chipColors(backgroundColor = Orange, contentColor = Color.Black),
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun AboutScreen() {
+    val ctx = LocalContext.current
+    val listState = rememberScalingLazyListState()
+    Scaffold(
+        timeText = { TimeText() },
+        positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
+    ) {
+        ScalingLazyColumn(state = listState, modifier = Modifier.fillMaxSize()) {
+            item { ListHeader { Text(stringResource(R.string.app_name)) } }
+            item { Paragraph(stringResource(SharedR.string.version_fmt, Notice.versionName(ctx))) }
+            item { ListHeader { Text(stringResource(SharedR.string.safety_title)) } }
+            item { Paragraph(stringResource(SharedR.string.notice_text)) }
+            item { ListHeader { Text(stringResource(SharedR.string.privacy_title)) } }
+            item { Paragraph(stringResource(SharedR.string.privacy_text)) }
+            item { Paragraph(stringResource(SharedR.string.licence_text)) }
+            item { Paragraph(stringResource(SharedR.string.source_url), color = Color.Gray) }
+        }
+    }
+}
+
+@Composable
+private fun Paragraph(text: String, color: Color = Color.White) {
+    Text(
+        text,
+        modifier = Modifier.fillMaxWidth().padding(horizontal = 12.dp, vertical = 4.dp),
+        textAlign = TextAlign.Center,
+        fontSize = 13.sp,
+        color = color,
+    )
+}

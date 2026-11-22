@@ -17,6 +17,7 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.navigation.SwipeDismissableNavHost
 import androidx.wear.compose.navigation.composable
 import androidx.wear.compose.navigation.rememberSwipeDismissableNavController
+import com.sauna.tracker.shared.Notice
 import com.sauna.tracker.wear.LiveSession
 import com.sauna.tracker.wear.R
 import com.sauna.tracker.wear.SessionService
@@ -102,13 +103,26 @@ fun WearNav(ambient: Boolean, ambientTick: Int) {
     }
 
     // Decided once: changing the start destination later would rebuild the graph and reset the back stack.
-    val startDestination = remember { if (LiveSession.state.value.running) Routes.SESSION else Routes.HOME }
+    val startDestination = remember {
+        when {
+            LiveSession.state.value.running -> Routes.SESSION
+            !Notice.accepted(context) -> Routes.NOTICE
+            else -> Routes.HOME
+        }
+    }
 
     MaterialTheme {
         SwipeDismissableNavHost(
             navController = nav,
             startDestination = startDestination,
         ) {
+            composable(Routes.NOTICE) {
+                NoticeScreen(onAccept = {
+                    Notice.accept(context)
+                    nav.navigate(Routes.HOME) { popUpTo(Routes.NOTICE) { inclusive = true } }
+                })
+            }
+            composable(Routes.ABOUT) { AboutScreen() }
             composable(Routes.HOME) {
                 HomeScreen(
                     live = live,
@@ -135,7 +149,7 @@ fun WearNav(ambient: Boolean, ambientTick: Int) {
                 RecentScreen(onOpen = { nav.navigate(Routes.summary(it)) })
             }
             composable(Routes.SETTINGS) {
-                SettingsScreen(onEdit = { nav.navigate(Routes.edit(it)) })
+                SettingsScreen(onEdit = { nav.navigate(Routes.edit(it)) }, onAbout = { nav.navigate(Routes.ABOUT) })
             }
             composable(Routes.EDIT) { entry ->
                 EditLimitScreen(which = entry.arguments?.getString("which") ?: "time")
@@ -148,6 +162,8 @@ fun WearNav(ambient: Boolean, ambientTick: Int) {
 private const val READ_HEART_RATE = "android.permission.health.READ_HEART_RATE"
 
 object Routes {
+    const val NOTICE = "notice"
+    const val ABOUT = "about"
     const val HOME = "home"
     const val SESSION = "session"
     const val SUMMARY = "summary/{id}"

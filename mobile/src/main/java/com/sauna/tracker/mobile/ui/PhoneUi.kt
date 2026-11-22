@@ -77,7 +77,11 @@ import com.sauna.tracker.mobile.CsvShare
 import com.sauna.tracker.mobile.R
 import com.sauna.tracker.shared.Session
 import com.sauna.tracker.shared.Settings
+import com.sauna.tracker.shared.Notice
 import com.sauna.tracker.shared.Repo
+import com.sauna.tracker.shared.R as SharedR
+import android.content.Intent
+import android.net.Uri
 import com.sauna.tracker.shared.db.SaunaDb
 import com.sauna.tracker.shared.db.SessionEntity
 import com.sauna.tracker.shared.db.loadSession
@@ -105,6 +109,20 @@ private fun formatDate(epochMs: Long) = dateFormat.format(Instant.ofEpochMilli(e
 @Composable
 fun PhoneNav() {
     val nav = rememberNavController()
+    val ctx = LocalContext.current
+    var noticeAccepted by remember { mutableStateOf(Notice.accepted(ctx)) }
+    if (!noticeAccepted) {
+        AlertDialog(
+            onDismissRequest = {}, // must be confirmed once
+            title = { Text(stringResource(SharedR.string.notice_title)) },
+            text = { Text(stringResource(SharedR.string.notice_text)) },
+            confirmButton = {
+                Button(onClick = { Notice.accept(ctx); noticeAccepted = true }) {
+                    Text(stringResource(SharedR.string.notice_ok))
+                }
+            },
+        )
+    }
     NavHost(nav, startDestination = "list") {
         composable("list") {
             ListScreen(
@@ -405,7 +423,7 @@ private fun SettingsScreen(onBack: () -> Unit) {
     Scaffold(
         topBar = { TopAppBar(title = { Text(stringResource(R.string.settings)) }, navigationIcon = { BackButton(onBack) }) },
     ) { padding ->
-        Column(Modifier.padding(padding).padding(16.dp)) {
+        Column(Modifier.padding(padding).verticalScroll(rememberScrollState()).padding(16.dp)) {
             LimitRow(
                 label = stringResource(R.string.time_limit),
                 value = settings.timeLimitMin,
@@ -430,6 +448,8 @@ private fun SettingsScreen(onBack: () -> Unit) {
             Spacer(Modifier.height(24.dp))
             HorizontalDivider()
             WatchConnection()
+            HorizontalDivider()
+            About()
         }
     }
 }
@@ -604,4 +624,39 @@ private fun WatchConnection() {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
+}
+
+// ---------------------------------------------------------------- About
+
+@Composable
+private fun About() {
+    val ctx = LocalContext.current
+    val url = stringResource(SharedR.string.source_url)
+    Column(Modifier.padding(vertical = 16.dp)) {
+        Text(stringResource(SharedR.string.about), style = MaterialTheme.typography.titleMedium)
+        Spacer(Modifier.height(4.dp))
+        Text(
+            stringResource(R.string.app_name) + " · " + stringResource(SharedR.string.version_fmt, Notice.versionName(ctx)),
+            style = MaterialTheme.typography.bodyMedium,
+        )
+        AboutParagraph(SharedR.string.safety_title, SharedR.string.notice_text)
+        AboutParagraph(SharedR.string.privacy_title, SharedR.string.privacy_text)
+        Spacer(Modifier.height(12.dp))
+        Text(stringResource(SharedR.string.licence_text), style = MaterialTheme.typography.bodyMedium)
+        TextButton(
+            onClick = { runCatching { ctx.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse(url))) } },
+            contentPadding = PaddingValues(0.dp),
+        ) { Text(stringResource(SharedR.string.source_code) + ": " + url) }
+    }
+}
+
+@Composable
+private fun AboutParagraph(title: Int, text: Int) {
+    Spacer(Modifier.height(12.dp))
+    Text(stringResource(title), style = MaterialTheme.typography.titleSmall)
+    Text(
+        stringResource(text),
+        style = MaterialTheme.typography.bodyMedium,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+    )
 }

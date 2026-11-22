@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="notice_title">Before you start</string>
+    <string name="notice_text">Sauna Pulse is not a medical device. A watch can measure heart rate inaccurately, especially in heat and with wet skin.\n\nThe vibration alerts are only reminders. Leave the sauna whenever you feel unwell, dizzy or too hot, whatever the app shows.\n\nIf you have heart or blood pressure problems, ask a doctor whether sauna is safe for you.</string>
+    <string name="notice_ok">I understand</string>
+    <string name="about">About</string>
+    <string name="version_fmt">Version %s</string>
+    <string name="privacy_title">Privacy</string>
+    <string name="privacy_text">Your data stays on your watch and phone. The apps have no internet access, no accounts, no ads and no analytics. Watch and phone talk to each other only directly over Bluetooth. Data leaves the devices only when you share a CSV yourself.</string>
+    <string name="licence_text">Free and open source software, licensed under the GNU GPL v3.</string>
+    <string name="source_code">Source code</string>
+    <string name="source_url" translatable="false">https://github.com/ivanleb/SaunaTimer</string>
+    <string name="safety_title">Safety</string>
+</resources>
