@@ -1,0 +1,1 @@
+First release: round timer, live heart rate, time and heart-rate vibration alerts, always-on display, loss protection when the watch turns off, direct Bluetooth sync with the phone app.

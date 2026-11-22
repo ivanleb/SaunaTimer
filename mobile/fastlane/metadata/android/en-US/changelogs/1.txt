@@ -1,0 +1,1 @@
+First release: round history, heart-rate graphs, comparison, CSV export, limits synced with the watch, direct Bluetooth sync without Google services.

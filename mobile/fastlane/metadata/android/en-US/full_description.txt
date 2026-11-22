@@ -1,0 +1,26 @@
+Sauna Pulse is the phone companion of the Sauna Pulse watch app for Wear OS. The watch times your sauna rounds and records your heart rate; the phone keeps the history.
+
+<b>Features</b>
+<ul>
+<li>List of all sauna rounds with duration, maximum and average heart rate</li>
+<li>Heart-rate graph of every round with your limits marked</li>
+<li>Compare rounds: overlay several graphs and see them side by side in a table</li>
+<li>Share one round or all of them as a CSV file</li>
+<li>Edit the time and heart-rate limits; they sync to the watch</li>
+<li>Delete wrongly recorded rounds; the deletion applies on the watch too</li>
+<li>English and Russian</li>
+</ul>
+
+<b>Sync without the cloud</b>
+The watch sends each round straight to the phone over Bluetooth when the round ends. Choose your watch once in Settings, and on Android 12 or later rounds arrive in the background, even when the app is closed. Rounds wait on the watch while the phone is out of range.
+
+<b>Privacy</b>
+Your data stays on your watch and phone. The apps have no internet permission, no accounts, no ads and no analytics, and cloud backup is turned off. Data leaves the devices only when you share a CSV yourself.
+
+<b>You also need the watch app</b>
+The watch app (Sauna Pulse for Wear OS) records the rounds. F-Droid has no client for watches, so install the watch APK from the project's GitHub Releases page; the README explains how.
+
+<b>Safety</b>
+Sauna Pulse is not a medical device. Heart rate measured by a watch can be inaccurate, especially in heat and with wet skin. Leave the sauna whenever you feel unwell, whatever the app shows.
+
+Developed and tested with a Samsung Galaxy Watch4. Other Wear OS 3+ watches with a heart-rate sensor should work.

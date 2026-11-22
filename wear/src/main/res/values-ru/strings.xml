@@ -28,8 +28,8 @@
     <string name="notif_channel">Активный заход</string>
     <string name="ambient_min_fmt">%d мин</string>
     <string name="syncing">Синхронизация с телефоном…</string>
-    <string name="sync_ok_fmt">Готово. Отправлено раундов: %d</string>
-    <string name="sync_no_permission">Разрешите «Устройства поблизости», чтобы отправлять раунды на телефон</string>
+    <string name="sync_ok_fmt">Готово. Отправлено заходов: %d</string>
+    <string name="sync_no_permission">Разрешите «Устройства поблизости», чтобы отправлять заходы на телефон</string>
     <string name="sync_bt_off">Bluetooth выключен</string>
     <string name="sync_no_phone">Сопряжённый телефон не найден</string>
     <string name="sync_unreachable">Телефон недоступен. Откройте «Сауна Пульс» на телефоне и повторите.</string>
