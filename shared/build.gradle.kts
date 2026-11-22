@@ -8,13 +8,12 @@ plugins {
 
 android {
     namespace = "com.sauna.tracker.shared"
-    compileSdk = 34
+    compileSdk = 36
     defaultConfig { minSdk = 26 }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions { jvmTarget = "17" }
 }
 
 dependencies {
@@ -33,4 +32,8 @@ dependencies {
     api(libs.compose.foundation)
 
     testImplementation(libs.junit)
+}
+
+kotlin {
+    compilerOptions { jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17) }
 }

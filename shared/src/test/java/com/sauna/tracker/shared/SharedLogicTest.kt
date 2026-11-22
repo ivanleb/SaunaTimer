@@ -61,6 +61,21 @@ class StatsAndCodecTest {
         assertEquals(interrupted, SessionCodec.decode(SessionCodec.encode(interrupted)))
     }
 
+    @Test fun compressedTransferRoundTrip() {
+        val long = session.copy(samples = (0 until 3600).map { HrSample(it * 1000L, 90 + it % 60) })
+        val packed = SessionCodec.encodeCompressed(long)
+        assertEquals(long, SessionCodec.decodeCompressed(packed))
+        assertTrue("1 h of 1 Hz samples must stay well below 100 KB", packed.size < 30_000)
+    }
+
+    @Test fun settingsAndIdsMessages() {
+        val s = Settings(12, 150, 1_700_000_000_123)
+        assertEquals(s, SessionCodec.decodeSettings(SessionCodec.encodeSettings(s)))
+        assertEquals(null, SessionCodec.decodeSettings("garbage".toByteArray()))
+        assertEquals(listOf("a", "b"), SessionCodec.decodeIds(SessionCodec.encodeIds(listOf("a", "b"))))
+        assertEquals(emptyList<String>(), SessionCodec.decodeIds(ByteArray(0)))
+    }
+
     @Test fun csv() {
         val lines = CsvExporter.toCsv(listOf(session), ZoneOffset.UTC).trim().lines()
         assertEquals(CsvExporter.HEADER, lines[0])

@@ -27,8 +27,12 @@ fun WearNav(ambient: Boolean, ambientTick: Int) {
     val nav = rememberSwipeDismissableNavController()
     val live by LiveSession.state.collectAsStateWithLifecycle()
 
-    val permissions = buildList {
+    val heartRatePermissions = buildList {
         add(Manifest.permission.BODY_SENSORS)
+        if (Build.VERSION.SDK_INT >= 36) add(READ_HEART_RATE)
+    }
+    val permissions = buildList {
+        addAll(heartRatePermissions)
         add(Manifest.permission.ACTIVITY_RECOGNITION)
         if (Build.VERSION.SDK_INT >= 33) add(Manifest.permission.POST_NOTIFICATIONS)
     }
@@ -41,15 +45,20 @@ fun WearNav(ambient: Boolean, ambientTick: Int) {
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
-        if (result[Manifest.permission.BODY_SENSORS] == true) startRound()
+        val heartRateGranted = heartRatePermissions.any {
+            result[it] == true ||
+                ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
+        if (heartRateGranted) startRound()
         else Toast.makeText(context, R.string.permission_needed, Toast.LENGTH_LONG).show()
     }
 
     fun requestStart() {
-        val missing = permissions.filter {
-            ContextCompat.checkSelfPermission(context, it) != PackageManager.PERMISSION_GRANTED
-        }
-        if (missing.isEmpty()) startRound() else permissionLauncher.launch(missing.toTypedArray())
+        fun granted(p: String) = ContextCompat.checkSelfPermission(context, p) == PackageManager.PERMISSION_GRANTED
+        val missing = permissions.filterNot(::granted)
+        // Heart rate is the only must-have; don't nag on every Start about the optional ones.
+        if (missing.isEmpty() || heartRatePermissions.any(::granted)) startRound()
+        else permissionLauncher.launch(missing.toTypedArray())
     }
 
     // When a round ends, replace the round screen with its summary.
@@ -101,6 +110,9 @@ fun WearNav(ambient: Boolean, ambientTick: Int) {
         }
     }
 }
+
+/** Wear OS 6 replacement for BODY_SENSORS (heart rate only). */
+private const val READ_HEART_RATE = "android.permission.health.READ_HEART_RATE"
 
 object Routes {
     const val HOME = "home"

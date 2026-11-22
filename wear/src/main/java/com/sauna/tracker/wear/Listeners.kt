@@ -3,32 +3,27 @@ package com.sauna.tracker.wear
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import com.google.android.gms.wearable.DataEvent
-import com.google.android.gms.wearable.DataEventBuffer
+import com.google.android.gms.wearable.CapabilityInfo
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
-import com.sauna.tracker.shared.DataPaths
 import com.sauna.tracker.shared.SyncHub
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-/** Receives settings, deletions and acknowledgements from the phone. */
+/**
+ * Messages and reconnects from the phone. Everything arrives directly from the nearby phone;
+ * nothing goes through the cloud (see SyncHub).
+ */
 class WearListenerService : WearableListenerService() {
     private val hub by lazy { SyncHub.get(this) }
 
-    override fun onDataChanged(events: DataEventBuffer) {
-        val items = events.filter { it.type == DataEvent.TYPE_CHANGED }.map { it.dataItem.freeze() }
-        runBlocking { items.forEach { hub.handleDataItem(it, isPhone = false) } }
+    override fun onMessageReceived(event: MessageEvent) {
+        runBlocking { hub.handleMessage(event, isPhone = false) }
     }
 
-    override fun onMessageReceived(event: MessageEvent) {
-        val path = event.path
-        runBlocking {
-            when {
-                path.startsWith(DataPaths.ACK_PREFIX) -> hub.onAck(path.removePrefix(DataPaths.ACK_PREFIX))
-                path == DataPaths.SYNC_REQUEST -> hub.sendAllUnsynced()
-            }
-        }
+    /** The phone app became reachable (Bluetooth reconnected): send what is queued. */
+    override fun onCapabilityChanged(info: CapabilityInfo) {
+        if (info.nodes.any { it.isNearby }) runBlocking { hub.onConnected(isPhone = false) }
     }
 }
 

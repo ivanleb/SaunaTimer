@@ -35,6 +35,6 @@ class MainActivity : ComponentActivity() {
 
     override fun onResume() {
         super.onResume()
-        appScope.launch { SyncHub.get(this@MainActivity).pullAll(isPhone = false) }
+        appScope.launch { SyncHub.get(this@MainActivity).onConnected(isPhone = false) }
     }
 }

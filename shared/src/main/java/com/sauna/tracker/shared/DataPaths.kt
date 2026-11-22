@@ -1,22 +1,26 @@
 package com.sauna.tracker.shared
 
-/** Wearable Data Layer paths shared by the watch and the phone app. */
+/**
+ * Paths used between the watch and the phone.
+ *
+ * Privacy: only MessageClient / ChannelClient are used, and only towards *nearby*
+ * (directly connected) nodes. The DataClient is deliberately not used, because DataItems
+ * are backed up to Google's cloud. Data therefore never leaves the two devices
+ * unless the user shares a CSV themselves.
+ */
 object DataPaths {
-    /** DataItem per finished session (watch -> phone). Asset [KEY_DATA] holds [SessionCodec] JSON. */
+    /** Channel watch -> phone, one per session. Payload: gzip'ed [SessionCodec] JSON. */
     const val SESSION_PREFIX = "/session/"
-    /** DataItem with the limits; each device publishes its own, newest [KEY_UPDATED_AT] wins. */
+    /** Message, both directions: "timeLimitMin,hrLimit,updatedAt". Newest wins. */
     const val SETTINGS = "/settings"
-    /** DataItem with ids this device deleted; the other device deletes them too. */
+    /** Message, both directions: comma-separated ids deleted on the sender. */
     const val DELETED = "/deleted"
-    /** Message phone -> watch: session stored, watch may mark it synced. */
+    /** Message phone -> watch: session stored, the watch may mark it synced. */
     const val ACK_PREFIX = "/ack/"
     /** Message phone -> watch: resend everything not yet synced. */
     const val SYNC_REQUEST = "/sync-request"
 
-    const val KEY_DATA = "data"
-    const val KEY_SENT_AT = "sentAt"
-    const val KEY_TIME_LIMIT = "timeLimitMin"
-    const val KEY_HR_LIMIT = "hrLimit"
-    const val KEY_UPDATED_AT = "updatedAt"
-    const val KEY_IDS = "ids"
+    /** Capabilities declared in res/values/wear.xml; their reachability changes on (re)connect. */
+    const val CAPABILITY_PHONE = "sauna_phone"
+    const val CAPABILITY_WATCH = "sauna_watch"
 }
