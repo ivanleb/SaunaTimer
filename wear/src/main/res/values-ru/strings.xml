@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Сауна таймер</string>
+    <string name="start">Старт</string>
+    <string name="limits_fmt">%1$d мин · %2$d уд/мин</string>
+    <string name="session_running">Идёт заход</string>
+    <string name="recent">Последние заходы</string>
+    <string name="settings">Настройки</string>
+    <string name="send_to_phone">Отправить на телефон</string>
+    <string name="unsent_fmt">Не отправлено: %d</string>
+    <string name="all_sent">Всё отправлено</string>
+    <string name="sending_fmt">Отправка: %d…</string>
+    <string name="stop">Стоп</string>
+    <string name="tap_again">Ещё раз</string>
+    <string name="time_limit">Лимит времени</string>
+    <string name="hr_limit">Лимит пульса</string>
+    <string name="unit_min">мин</string>
+    <string name="unit_bpm">уд/мин</string>
+    <string name="max_avg_fmt">Макс %1$d · Сред %2$d</string>
+    <string name="interrupted">Прервано (часы выключились)</string>
+    <string name="synced">Отправлено на телефон</string>
+    <string name="not_synced">Ожидает телефон</string>
+    <string name="done">Готово</string>
+    <string name="delete">Удалить</string>
+    <string name="no_sessions">Заходов пока нет</string>
+    <string name="permission_needed">Нужно разрешение на пульс</string>
+    <string name="hr_error">Датчик пульса недоступен</string>
+    <string name="notif_title">Заход в сауну</string>
+    <string name="notif_channel">Активный заход</string>
+    <string name="ambient_min_fmt">%d мин</string>
+</resources>

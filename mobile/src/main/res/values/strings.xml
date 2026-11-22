@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Sauna Tracker</string>
+    <string name="sessions">Sauna rounds</string>
+    <string name="no_sessions">No rounds yet. Record one on the watch and it will show up here automatically.</string>
+    <string name="request_sync">Sync with watch</string>
+    <string name="sync_requested">Asked the watch to send new rounds</string>
+    <string name="no_watch">Watch not connected</string>
+    <string name="compare">Compare</string>
+    <string name="compare_fmt">Compare (%d)</string>
+    <string name="share_csv">Share CSV</string>
+    <string name="export_all">Export all to CSV</string>
+    <string name="delete">Delete</string>
+    <string name="delete_fmt">Delete (%d)</string>
+    <string name="delete_title">Delete rounds?</string>
+    <string name="delete_message_fmt">%d round(s) will be deleted from the phone and the watch.</string>
+    <string name="cancel">Cancel</string>
+    <string name="clear_selection">Clear</string>
+    <string name="back">Back</string>
+    <string name="settings">Settings</string>
+    <string name="time_limit">Time limit</string>
+    <string name="hr_limit">Heart rate limit</string>
+    <string name="unit_min">min</string>
+    <string name="unit_bpm">bpm</string>
+    <string name="settings_hint">Synced with the watch. The watch vibrates once when the time limit is reached, and every 30 s while the heart rate is at or above the limit. New values apply to the next round.</string>
+    <string name="duration">Duration</string>
+    <string name="max">Max</string>
+    <string name="avg">Avg</string>
+    <string name="above_limit">At/above limit</string>
+    <string name="date">Date</string>
+    <string name="limits_fmt">Limits: %1$d min · %2$d bpm</string>
+    <string name="interrupted">Interrupted (watch turned off)</string>
+    <string name="summary_fmt">%1$s · max %2$d · avg %3$d</string>
+    <string name="x_axis">Minutes from start</string>
+</resources>

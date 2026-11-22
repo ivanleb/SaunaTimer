@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Сауна трекер</string>
+    <string name="sessions">Заходы в сауну</string>
+    <string name="no_sessions">Заходов пока нет. Запишите заход на часах, и он появится здесь автоматически.</string>
+    <string name="request_sync">Синхронизировать с часами</string>
+    <string name="sync_requested">Запрос на отправку новых заходов отправлен на часы</string>
+    <string name="no_watch">Часы не подключены</string>
+    <string name="compare">Сравнение</string>
+    <string name="compare_fmt">Сравнить (%d)</string>
+    <string name="share_csv">Поделиться CSV</string>
+    <string name="export_all">Экспорт всех в CSV</string>
+    <string name="delete">Удалить</string>
+    <string name="delete_fmt">Удалить (%d)</string>
+    <string name="delete_title">Удалить заходы?</string>
+    <string name="delete_message_fmt">Заходов будет удалено: %d (на телефоне и на часах).</string>
+    <string name="cancel">Отмена</string>
+    <string name="clear_selection">Сбросить</string>
+    <string name="back">Назад</string>
+    <string name="settings">Настройки</string>
+    <string name="time_limit">Лимит времени</string>
+    <string name="hr_limit">Лимит пульса</string>
+    <string name="unit_min">мин</string>
+    <string name="unit_bpm">уд/мин</string>
+    <string name="settings_hint">Синхронизируется с часами. Часы вибрируют один раз по достижении лимита времени и каждые 30 с, пока пульс на уровне лимита или выше. Новые значения действуют со следующего захода.</string>
+    <string name="duration">Длительность</string>
+    <string name="max">Макс</string>
+    <string name="avg">Сред</string>
+    <string name="above_limit">На лимите и выше</string>
+    <string name="date">Дата</string>
+    <string name="limits_fmt">Лимиты: %1$d мин · %2$d уд/мин</string>
+    <string name="interrupted">Прервано (часы выключились)</string>
+    <string name="summary_fmt">%1$s · макс %2$d · сред %3$d</string>
+    <string name="x_axis">Минуты от начала</string>
+</resources>
