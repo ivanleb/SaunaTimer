@@ -6,7 +6,7 @@ SourceCode: https://github.com/ivanleb/SaunaTimer
 IssueTracker: https://github.com/ivanleb/SaunaTimer/issues
 Changelog: https://github.com/ivanleb/SaunaTimer/releases
 
-AutoName: Sauna Pulse for Wear OS
+AutoName: Sauna Pulse
 
 RepoType: git
 Repo: https://github.com/ivanleb/SaunaTimer.git
