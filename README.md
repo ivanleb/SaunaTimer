@@ -2,7 +2,7 @@
 
 A sauna round timer and heart-rate recorder for Wear OS watches (developed on a Galaxy Watch4), with a phone companion app for history, comparison and CSV export.
 
-> **Status: work in progress, heading for F-Droid.** The apps run and have been tested on a real Galaxy Watch4 and an Android 14 phone. They have no Google Play Services dependency.
+> **Status: version 1.0.0 is out ([install](#install)); the main F-Droid repository listing is in review.** The apps run and have been tested on a real Galaxy Watch4 and an Android 14 phone. They have no Google Play Services dependency.
 
 ## Features
 - **Watch:** round timer, live BPM, a heart-rate graph, vibration alerts and an always-on (ambient) display during a round.
@@ -42,17 +42,27 @@ APKs are written to `wear/build/outputs/apk/debug/` and `mobile/build/outputs/ap
 
 Release builds read the signing key from `keystore.properties`; see `keystore.properties.example`. That file and keystores are git-ignored.
 
-## Install (sideload)
-**Phone:** turn on USB debugging, then run `adb install -r mobile-debug.apk`.
+## Install
+The APKs are on [GitHub Releases](https://github.com/ivanleb/SaunaTimer/releases): `SaunaPulse-phone-<version>.apk` and `SaunaPulse-watch-<version>.apk`.
 
-**Watch:**
+**Phone, with automatic updates:** add this F-Droid repository in F-Droid, Neo Store or Droid-ify, then install *Sauna Pulse*:
+
+```
+https://ivanleb.github.io/SaunaTimer/repo?fingerprint=1E8326F8096738182F9BE873F58252A179E3D0F542290F592BAC8C384B870C5C
+```
+
+Or open [the repository page](https://ivanleb.github.io/SaunaTimer/repo/) and scan its QR code. The repository signing key fingerprint (SHA-256) is `1E 83 26 F8 09 67 38 18 2F 9B E8 73 F5 82 52 A1 79 E3 D0 F5 42 29 0F 59 2B AC 8C 38 4B 87 0C 5C`. You can also use [Obtainium](https://github.com/ImranR98/Obtainium) with `https://github.com/ivanleb/SaunaTimer`, or install the phone APK directly.
+
+New versions appear in the repository as soon as they are published. Both sources carry the same signature as the upcoming main F-Droid build, so you can switch between them later without reinstalling.
+
+**Watch** (Wear OS has no convenient installer outside Google Play, so install over Wi-Fi from a PC):
 1. Settings → About watch → Software → tap *Software version* 5 times to enable Developer options.
 2. In Developer options, turn on *ADB debugging* and *Wireless debugging*. The watch and the PC must be on the same Wi-Fi.
 3. Wireless debugging → *Pair new device*, then on the PC run:
    ```
    adb pair <ip>:<pair-port>      # enter the code shown on the watch
    adb connect <ip>:<port>
-   adb -s <ip>:<port> install -r wear-debug.apk
+   adb -s <ip>:<port> install -r SaunaPulse-watch-<version>.apk
    ```
 4. Open the app and allow the heart-rate, notification and *Nearby devices* permissions on first Start.
 

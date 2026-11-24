@@ -29,3 +29,33 @@ For a new release:
    (the same for `SaunaPulse-watch-X.Y.Z.apk`).
 4. Upload both APKs to the GitHub Release `vX.Y.Z` with exactly these file names. F-Droid picks
    the tag up automatically (`UpdateCheckMode: Tags`) and checks the APKs against its own build.
+
+## Self-hosted repo
+
+Until the apps are in the main F-Droid repo (and alongside it afterwards), we publish our own
+F-Droid repo at <https://ivanleb.github.io/SaunaTimer/repo>. The workflow
+`.github/workflows/fdroid-repo.yml` runs `repo/build-repo.sh` whenever a GitHub Release is published
+(or by hand: Actions → F-Droid repo → Run workflow). It downloads the APKs of all releases, builds an
+index with the fastlane texts and icons, signs it and deploys it to GitHub Pages. The APKs are not
+rebuilt and keep our release signature.
+
+The index is signed with a separate repo key: `C:/Users/il/keys/saunapulse-fdroid-repo.p12`,
+alias `saunapulse-repo`, valid until 2057. Its password is in `saunapulse-fdroid-repo.password.txt`
+next to it. Never commit either file. Fingerprint (SHA-256), which users check when adding the repo:
+`1E8326F8096738182F9BE873F58252A179E3D0F542290F592BAC8C384B870C5C`. If this key is lost, existing
+users would have to remove and re-add the repo, so back it up with the release key.
+
+One-time GitHub setup:
+1. Settings → Secrets and variables → Actions → New repository secret:
+   - `FDROID_REPO_KEYSTORE`: the content of `saunapulse-fdroid-repo.p12.base64.txt`
+   - `FDROID_REPO_KEYSTORE_PASS`: the content of `saunapulse-fdroid-repo.password.txt`
+2. Settings → Pages → Build and deployment → Source: **GitHub Actions**.
+3. Settings → Environments → `github-pages` → Deployment branches and tags → add a tag rule `v*`
+   (release runs come from the tag, and by default only `main` may deploy). The environment appears
+   after step 2.
+
+Local test run (WSL, with `pip install fdroidserver`): set `REPO_KEYSTORE` and
+`REPO_KEYSTORE_PASS`, plus `FDROID_APKSIGNER` if there is no Android SDK, then run
+`bash fdroid/repo/build-repo.sh /tmp/fdroid-repo`.
+
+For a new release, step 4 above is all it takes: publishing the GitHub Release updates this repo.

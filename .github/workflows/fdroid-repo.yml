@@ -1,0 +1,56 @@
+# Publishes the self-hosted F-Droid repo to GitHub Pages whenever a release is published.
+# Setup and secrets: fdroid/README.md, section "Self-hosted repo".
+name: F-Droid repo
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install fdroidserver
+        run: pip install fdroidserver==2.4.5
+
+      - name: Build and sign the repo
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO_KEYSTORE_BASE64: ${{ secrets.FDROID_REPO_KEYSTORE }}
+          REPO_KEYSTORE_PASS: ${{ secrets.FDROID_REPO_KEYSTORE_PASS }}
+        run: |
+          export REPO_KEYSTORE="$RUNNER_TEMP/repo-key.p12"
+          echo "$REPO_KEYSTORE_BASE64" | base64 -d > "$REPO_KEYSTORE"
+          bash fdroid/repo/build-repo.sh "$RUNNER_TEMP/fdroid"
+          rm -f "$REPO_KEYSTORE"
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: ${{ runner.temp }}/fdroid/site
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-24.04
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
