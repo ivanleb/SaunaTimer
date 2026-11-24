@@ -10,6 +10,7 @@ AutoName: Sauna Pulse
 
 RepoType: git
 Repo: https://github.com/ivanleb/SaunaTimer.git
+Binaries: https://github.com/ivanleb/SaunaTimer/releases/download/v%v/SaunaPulse-phone-%v.apk
 
 Builds:
   - versionName: 1.0.0
@@ -18,6 +19,8 @@ Builds:
     subdir: mobile
     gradle:
       - yes
+
+AllowedAPKSigningKeys: 86cb6182c8f41b077e5d8c3cd800aa25749af4cde953baea36c5fe5c015b4486
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
