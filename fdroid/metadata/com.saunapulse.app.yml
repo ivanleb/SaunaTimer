@@ -10,7 +10,8 @@ AutoName: Sauna Pulse
 
 RepoType: git
 Repo: https://github.com/ivanleb/SaunaTimer.git
-Binaries: https://github.com/ivanleb/SaunaTimer/releases/download/v%v/SaunaPulse-phone-%v.apk
+Binaries: 
+  https://github.com/ivanleb/SaunaTimer/releases/download/v%v/SaunaPulse-phone-%v.apk
 
 Builds:
   - versionName: 1.0.0
